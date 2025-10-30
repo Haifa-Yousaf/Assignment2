@@ -15,7 +15,7 @@ describe("Module imports", () => {
 describe("Run script", () => {
   test("should call satellite.getTable with required arguments", () => {
     const spy = jest.spyOn(satellite, "getTable").mockImplementation(() => {});
-    require("../run"); // imports and runs your main script
+    require("./run"); // imports and runs your main script
     expect(spy).toHaveBeenCalledWith(
       expect.objectContaining({
         target: expect.any(Number),
