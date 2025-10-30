@@ -9,7 +9,9 @@ on:
 jobs:
   run-scheduled-task:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write
+      
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -32,6 +34,6 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add public/data || true
+          git add -f public/data || true
           git commit -m "Auto-update data from scheduled task" || echo "No changes to commit"
           git push
