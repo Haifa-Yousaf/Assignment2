@@ -1,0 +1,33 @@
+version: 2
+updates:
+  # -----------------------------
+  # JavaScript / Node.js packages
+  # -----------------------------
+  - package-ecosystem: "npm"
+    directory: "/"                     # location of package.json
+    schedule:
+      interval: "weekly"               # checks every week
+      day: "friday"                    # optional: run on Sundays
+      time: "00:00"
+      timezone: "Asia/Karachi"
+    open-pull-requests-limit: 5
+    versioning-strategy: increase      # use semver minor/patch increments
+    commit-message:
+      prefix: "deps"
+      include: scope
+    reviewers:
+      - Haifa-Yousaf                   # you’ll be auto-assigned to review updates
+
+  # -----------------------------
+  # GitHub Actions workflow deps
+  # -----------------------------
+  - package-ecosystem: "github-actions"
+    directory: "/"                     # checks .github/workflows/
+    schedule:
+      interval: "weekly"
+      day: "friday"
+      time: "00:05"
+      timezone: "Asia/Karachi"
+    commit-message:
+      prefix: "ci"
+      include: scope
