@@ -1,6 +1,6 @@
 // tests/run.test.js
-const satellite = require("../src/satellite");
-const iridium = require("../src/iridium");
+const satellite = require("./src/satellite");
+const iridium = require("./src/iridium");
 
 describe("Module imports", () => {
   test("satellite module should have a getTable function", () => {
