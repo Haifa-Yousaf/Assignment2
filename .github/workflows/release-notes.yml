@@ -42,11 +42,13 @@ jobs:
 
       - name: Generate release notes
         id: notes
+        if: ${{ steps.get_tag.outputs.latest_tag != 'v0.0.0' }}
         uses: mikepenz/release-changelog-builder-action@v5
         with:
           configuration: ".github/release-notes-config.json"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
