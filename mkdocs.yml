@@ -1,0 +1,7 @@
+site_name: Assignment 2 Documentation
+theme:
+  name: material
+nav:
+  - Home: index.md
+  - Setup: setup.md
+  - Usage: usage.md
