@@ -1,17 +1,17 @@
-name: Dependency Update Validation
+name: Dependency Update Automation
 
 on:
-  pull_request:
+  push:
     branches:
       - main
+  workflow_dispatch:  # allows manual run
 
 permissions:
   contents: write
   pull-requests: write
 
 jobs:
-  validate:
-    if: ${{ github.actor == 'dependabot[bot]' }}
+  dependency-update:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,14 +26,46 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Check for outdated dependencies
+        id: check
+        run: |
+          OUTDATED=$(npm outdated || true)
+          echo "$OUTDATED"
+          echo "outdated=$OUTDATED" >> $GITHUB_OUTPUT
+          if [ -z "$OUTDATED" ]; then
+            echo "All dependencies are up to date!"
+          else
+            echo "Dependencies need updates."
+          fi
+
+      - name: Update dependencies and create PR
+        if: ${{ steps.check.outputs.outdated != '' }}
+        run: |
+          npm update
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          BRANCH="auto-dependency-update-$(date +'%Y%m%d%H%M%S')"
+          git checkout -b $BRANCH
+          git add package*.json
+          git commit -m "chore: automated dependency updates"
+          git push origin $BRANCH
+          
+          # Check if a similar PR already exists
+          if gh pr list --search "automated dependency updates" --state open | grep -q "automated dependency updates"; then
+            echo "A dependency update PR already exists. Skipping new PR creation."
+          else
+            gh pr create \
+              --title "chore: automated dependency updates" \
+              --body "This PR updates project dependencies automatically." \
+              --base main \
+              --head $BRANCH
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
       - name: Run ESLint
         run: npm run lint
 
       - name: Run Jest tests
         run: npm test -- --coverage --ci
-
-      - name: Auto-merge Dependabot PR if all checks pass
-        uses: fastify/github-action-merge-dependabot@v3
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          merge-method: squash
