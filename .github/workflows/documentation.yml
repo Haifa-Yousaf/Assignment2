@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: write   # needed for pushing to gh-pages
 
 jobs:
   build-and-deploy-docs:
