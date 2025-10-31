@@ -2,8 +2,8 @@ name: Scheduled Tasks
 
 on:
   schedule:
-    # Every day at 12:00 AM UTC (5:00 AM Pakistan time)
-  - cron: "0 0 */3 * *"
+    # Every 3rd day at 12:00 AM
+    - cron: "0 0 */3 * *"
   workflow_dispatch:  # allows manual trigger
 
 jobs:
@@ -21,19 +21,35 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Install dependencies
+      - name: Install Node dependencies
         run: npm ci
 
       - name: Ensure public/data folder exists
         run: mkdir -p public/data
 
-      - name: Run scheduled script
+      - name: Run Node.js Task
         run: node run.js
 
       - name: Commit updated data
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add -f public/data || true
+          git add -f public/data
           git commit -m "Auto-update data from scheduled task" || echo "No changes to commit"
           git push
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Run Python Task
+        run: |
+          mkdir -p task-logs
+          python scripts/daily_task.py > task-logs/output.log 2>&1
+
+      - name: Upload Python Task Logs
+        uses: actions/upload-artifact@v3
+        with:
+          name: scheduled-task-logs
+          path: task-logs/
