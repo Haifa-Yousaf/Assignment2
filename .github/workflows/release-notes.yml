@@ -17,11 +17,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Get latest tag
+      - name: Get latest tag (with fallback)
         id: get_tag
         run: |
           git fetch --tags
-          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          TAGS=$(git tag)
+          if [ -z "$TAGS" ]; then
+            echo "No existing tags found. Using v0.0.0 as starting version."
+            LATEST_TAG="v0.0.0"
+          else
+            LATEST_TAG=$(git describe --tags --abbrev=0)
+          fi
           echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
 
       - name: Generate new version number
