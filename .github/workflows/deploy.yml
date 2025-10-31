@@ -1,4 +1,4 @@
-name: Deployment Pipeline (Vercel)
+name: Deployment Pipeline
 
 on:
   push:
@@ -37,3 +37,10 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
           npx vercel --prod --yes --token=$VERCEL_TOKEN
+
+      - name: Upload deployment logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-logs
+          path: logs/
+
