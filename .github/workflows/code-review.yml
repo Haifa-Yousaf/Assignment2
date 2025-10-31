@@ -43,7 +43,15 @@ jobs:
         run: npm ci
 
       - name: Run ESLint (Code Quality)
-        run: npm run lint
+        run: |
+          mkdir -p eslint-artifacts
+          npx eslint . -f html -o eslint-artifacts/eslint-report.html
+
+      - name: Upload ESLint Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: eslint-report
+          path: eslint-artifacts/
 
       - name: Run Jest Tests
         run: npm test -- --coverage --ci
