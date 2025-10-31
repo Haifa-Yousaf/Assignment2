@@ -4,14 +4,14 @@ on:
   schedule:
     # Every 3rd day at 12:00 AM
     - cron: "0 0 */3 * *"
-  workflow_dispatch:  # allows manual trigger
+  workflow_dispatch:
 
 jobs:
   run-scheduled-task:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -25,9 +25,7 @@ jobs:
         run: npm ci
 
       - name: Ensure public/data folder exists
-        shell: pwsh
-        run: |
-          New-Item -ItemType Directory -Force -Path public\data
+        run: mkdir -p public/data
 
       - name: Run Node.js Task
         run: node run.js
@@ -43,12 +41,11 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: "3.13"
 
       - name: Run Python Task
-        shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force -Path task-logs
+          mkdir -p task-logs
           python scripts/daily_task.py > task-logs/output.log 2>&1
 
       - name: Upload Python Task Logs
