@@ -1,0 +1,52 @@
+name: Generate Release Notes
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # allow manual run
+
+permissions:
+  contents: write
+
+jobs:
+  generate-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get latest tag
+        id: get_tag
+        run: |
+          git fetch --tags
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+
+      - name: Generate new version number
+        id: version
+        run: |
+          LATEST=${{ steps.get_tag.outputs.latest_tag }}
+          echo "Latest tag: $LATEST"
+          IFS='.' read -r major minor patch <<< "${LATEST#v}"
+          NEW_TAG="v$major.$minor.$((patch+1))"
+          echo "New tag: $NEW_TAG"
+          echo "new_tag=$NEW_TAG" >> $GITHUB_OUTPUT
+
+      - name: Generate release notes
+        id: notes
+        uses: mikepenz/release-changelog-builder-action@v5
+        with:
+          configuration: ".github/release-notes-config.json"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.new_tag }}
+          name: "Release ${{ steps.version.outputs.new_tag }}"
+          body: ${{ steps.notes.outputs.changelog }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
