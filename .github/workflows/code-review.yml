@@ -48,7 +48,7 @@ jobs:
           npx eslint . -f html -o eslint-artifacts/eslint-report.html
 
       - name: Upload ESLint Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: eslint-report
           path: eslint-artifacts/
