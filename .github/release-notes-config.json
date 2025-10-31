@@ -1,6 +1,7 @@
 {
+  "fetchViaCommits": true,
   "filters": {
-    "excludePullRequests": true
+    "excludePullRequests": true,
   },
   "groupBy": "type",
   "types": [
