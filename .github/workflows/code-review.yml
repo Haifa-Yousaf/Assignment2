@@ -1,0 +1,68 @@
+name: Automated Code Review and Quality Checks
+
+on:
+  push:
+    branches:
+      - main
+      - "feature/**"
+      - "fix/**"
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+  statuses: write
+
+jobs:
+  code-review:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate branch naming convention
+        id: branch_check
+        run: |
+          BRANCH_NAME="${GITHUB_REF_NAME}"
+          echo "Checking branch name: $BRANCH_NAME"
+          if [[ ! "$BRANCH_NAME" =~ ^(feature|fix|hotfix|chore)\/[a-z0-9._-]+$ ]]; then
+            echo "Branch name '$BRANCH_NAME' does not follow convention (feature/, fix/, hotfix/, chore/)"
+            exit 1
+          else
+            echo "Branch name follows convention."
+          fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint (Code Quality)
+        run: npm run lint
+
+      - name: Run Jest Tests
+        run: npm test -- --coverage --ci
+
+      - name: Post Code Review Summary on PR
+        if: github.event_name == 'pull_request' && success()
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: automated-code-review
+          message: |
+            **Automated Code Review Summary**
+            - Branch name: valid  
+            - ESLint: passed  
+            - Tests: passed  
+            - Coverage: generated  
+            > All checks successful. Please proceed with manual review or merge.
+
+      - name: Auto Approve if All Checks Pass (optional)
+        if: github.event_name == 'pull_request' && success()
+        uses: hmarr/auto-approve-action@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
