@@ -25,7 +25,9 @@ jobs:
         run: npm ci
 
       - name: Ensure public/data folder exists
-        run: mkdir -p public/data
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path public\data
 
       - name: Run Node.js Task
         run: node run.js
@@ -44,8 +46,9 @@ jobs:
           python-version: "3.11"
 
       - name: Run Python Task
+        shell: pwsh
         run: |
-          mkdir -p task-logs
+          New-Item -ItemType Directory -Force -Path task-logs
           python scripts/daily_task.py > task-logs/output.log 2>&1
 
       - name: Upload Python Task Logs
