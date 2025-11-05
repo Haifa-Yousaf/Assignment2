@@ -1,1 +1,0 @@
-An empty txt file to check that the deployment logs can be saved in the logs folder.
