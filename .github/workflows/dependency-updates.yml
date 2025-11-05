@@ -29,7 +29,7 @@ jobs:
       - name: Check for outdated dependencies
         id: check
         run: |
-          OUTDATED=$(npm outdated || true)
+          OUTDATED=$(npm outdated --parseable --long | cut -d: -f4 | paste -sd "," - || true)
           echo "$OUTDATED"
           echo "outdated=$OUTDATED" >> $GITHUB_OUTPUT
           if [ -z "$OUTDATED" ]; then
