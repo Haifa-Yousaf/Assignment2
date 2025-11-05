@@ -61,7 +61,7 @@ jobs:
               --head $BRANCH
           fi
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PR_ACTIONS_TOKEN }}
 
 
       - name: Run ESLint
