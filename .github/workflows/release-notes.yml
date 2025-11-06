@@ -44,7 +44,7 @@ jobs:
 
       - name: Generate release notes (JSON, commits only)
         id: notes
-        uses: mikepenz/release-changelog-builder-action@v5
+        uses: mikepenz/release-changelog-builder-action@v6
         with:
           configuration: ".github/release-notes-config.json"
           outputFile: "release-notes.json"
