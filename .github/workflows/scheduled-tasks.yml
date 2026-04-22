@@ -1,10 +1,10 @@
 name: Scheduled Tasks
 
 on:
-  schedule:
+# schedule:
     # Every 3rd day at 12:00 AM UTC
-    - cron: "0 0 */3 * *"
-  workflow_dispatch:  # allows manual trigger
+   # - cron: "0 0 */3 * *"
+ # workflow_dispatch:  # allows manual trigger
 
 jobs:
   run-scheduled-task:
